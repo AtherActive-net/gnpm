@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "commander": "^10.0.0"
+  },
+  "name": "gnpm",
+  "description": "A NodeJS package manager made to allow 1 centralised location for packaged on your system.",
+  "version": "0.1.0",
+  "main": "./distsrc/index.js",
+  "bin": {
+    "gnpm": "./dist/src/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AtherActive-net/gpm.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AtherActive-net/gpm/issues"
+  },
+  "homepage": "https://github.com/AtherActive-net/gpm#readme",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^18.14.6"
+  }
+}

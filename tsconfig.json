@@ -1,0 +1,32 @@
+{
+	"compilerOptions": {
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"watch": true,
+		"target": "ES6",
+		"moduleResolution": "Node",
+		"allowSyntheticDefaultImports": true,
+		"outDir": "dist/",
+		"lib": ["ES2021"],
+		"declaration": true,
+		"module": "ESNext",
+		"skipLibCheck": true,
+		"baseUrl": "./src",
+        "resolveJsonModule": true,
+
+		"paths": {
+			"@core/*": ["./src/*"],
+		}
+	},
+	"tsc-alias": {
+		"verbose": false,
+		"resolveFullPaths": true,
+		"aliases": {
+			"@core": "./src"
+		}
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules"],
+
+	
+}
