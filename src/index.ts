@@ -1,4 +1,5 @@
-#!/opt/homebrew/bin/node
+#!/bin/sh
+':' //; exec "$(command -v nodejs || command -v node)" "$0" "$@"
 import os from "os";
 import {exec} from "child_process";
 import { Command } from "commander";
