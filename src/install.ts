@@ -10,7 +10,7 @@ let fetchedDependencies = [];
 
 export async function installPackage(name:string,version:string,root:boolean = false) {
     const metadata:any = await getPackageMetaData(name,version);
-    if(metadata === "not found") return false;
+    if(metadata === "not found" || metadata == null) return false;
 
     version = getVersion(metadata)
     metadata.version = version;
