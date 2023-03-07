@@ -1,17 +1,13 @@
+#!/opt/homebrew/bin/node
 import os from "os";
 import {exec} from "child_process";
 import { Command } from "commander";
 import pjson from "../package.json" assert {type: "json"};
 
 import { createFolderIfNotExists } from "./prereqs.js";
-import { 
-    doesPackageExist,
-    installPackage,
-    createSymLinks,
- } from "./install.js";
+import { installPackage} from "./install.js";
 
 const program = new Command();
-createFolderIfNotExists(os.homedir() + "/.gnpm");
 
 program
     .name("test")
@@ -26,9 +22,19 @@ program.command("install")
         options.version = options.version ? options.version : "latest"
 
         console.log("Installing package", pkg, "with version", options.version)
-        if(!await doesPackageExist(pkg, options.version)) return
-        if(!await installPackage(pkg, options.version)) return
-        if(!await createSymLinks(pkg, options.version)) return
+        await installPackage(pkg,options.version,true);
     });
+
+program.command("run")
+    .description("Run a script")
+    .argument("<script>", "Script to run")
+    .action(async (script:string) => {
+        console.log("Running script", script)
+
+        const child = exec(`node --preserve-symlinks ${script}`, {cwd: process.cwd()});
+        child.stdout.pipe(process.stdout);
+        child.stderr.pipe(process.stderr);
+
+    })
 
 program.parse();

@@ -1,72 +1,77 @@
 import {exec} from "child_process";
 import os from "os";
 import fs from "fs";
+import tar from "tar";
 
-export async function doesPackageExist(packageName, version) {
-    return new Promise((resolve, reject) => {
-        exec(`npm view ${packageName}@${version} version`, (error, stdout, stderr) => {
-            if (error) {
-                console.log(`Package ${packageName}@${version} does not exist`);
-                resolve(false);
-                return;
-            }
-            if (stderr) {
-                console.log(`Package ${packageName}@${version} does not exist`);
-                resolve(false);
-                return;
-            }
-            console.log(`Package ${packageName}@${version} exists`);
-            resolve(true);
-        });
+import { fetchArchive, fetchNpm } from "./lib/fetch.js";
+import { createModuleDir, getPackageMetaData, getVersion, isInstalled } from "./lib/common.js";
+
+let fetchedDependencies = [];
+
+export async function installPackage(name:string,version:string,root:boolean = false) {
+    const metadata:any = await getPackageMetaData(name,version);
+    if(metadata === "not found") return false;
+
+    version = getVersion(metadata)
+    metadata.version = version;
+
+    if(!isInstalled(name,version)) {
+        await downloadPackage(metadata);
+    } else {
+        console.log(`Package ${name}@${version} found in cache`);
+    }
+
+    await createSymLink(metadata.name,metadata.version);
+
+    if(metadata?.dependencies) await installDependencies(metadata);
+    if(root) fetchedDependencies = new Array();
+}
+
+export async function downloadPackage(metadata) {
+    console.log(`Downloading package ${metadata.name}@${metadata.version}...`)
+
+    const archive = await fetchArchive(metadata.dist.tarball);
+    if(archive === null) return false;
+
+    await createModuleDir(metadata.name,metadata.version)
+
+    // Write and extract tarball
+    const packageFolder = `${os.homedir()}/.gnpm/modules/${metadata.name}-${metadata.version}`;
+    fs.writeFileSync(`${packageFolder}/package.tar`, Buffer.from(archive));
+    await extractTarball(packageFolder);
+}
+
+
+async function extractTarball(packageFolder: string) {
+    await tar.x({
+        file: `${packageFolder}/package.tar`,
+        cwd: packageFolder,
+        strip: 1
     });
 }
 
-export function createPackageFolderIfNeeded(packageName, version) {
-    const packageFolder = `${os.homedir()}/.gnpm/modules/${packageName}-${version}`;
+async function installDependencies(metadata) {
+    const dependencies = metadata.dependencies;
 
-    if (!fs.existsSync(packageFolder)) {
-        fs.mkdirSync(packageFolder);
+    const promises = [];
+    for(const dependency in dependencies) {
+        if(fetchedDependencies.includes(`${dependency}`)) continue;
+
+        fetchedDependencies.push(`${dependency}`);
+        promises.push(installPackage(dependency,dependencies[dependency]));
     }
-    return packageFolder;
+    await Promise.all(promises);
 }
 
-export async function installPackage(packageName,version) {
-    const folder = createPackageFolderIfNeeded(packageName, version);
-    const command = `
-        cd ${folder} &&
-        npm install ${packageName}@${version} &&
-        mkdir -p ${process.cwd()}/node_modules
-    `
 
-    return new Promise((resolve, reject) => {
-        exec(command, (error, stdout, stderr) => {
-            if (error && error.code === 1) {
-                console.log(`Something went wrong while installing package ${packageName}@${version}\n ${error.message}`);
-                resolve(false);
-                return;
-            }
-            console.log(`Package ${packageName}@${version} installed`);
-            resolve(true);
-            return;
-        })
-    })
-}
+
 "ln -s ${process.cwd()}/node_modules/${packageName} ${folder}/node_modules/${packageName}"
-export function createSymLinks(packageName,version) {
-    console.log("Creating symlinks...")
+export function createSymLink(packageName,version) {
 
     const packageFolder = `${os.homedir()}/.gnpm/modules/${packageName}-${version}`;
-    const packageNodeModules = `${packageFolder}/node_modules`;
 
-    const folderContents = fs.readdirSync(packageNodeModules);
 
-    let command = `
-        cd ${packageNodeModules}`
-
-    folderContents.forEach((dir) => {
-        if(!fs.lstatSync(`${packageNodeModules}/${dir}`).isDirectory()) return;
-        command += ` && ln -s ${packageNodeModules}/${dir} ${process.cwd()}/node_modules/${dir}`
-    })
+    let command = `ln -sf ${packageFolder} ${process.cwd()}/node_modules/${packageName}`
 
     return new Promise((resolve, reject) => {
         exec(command, (error, stdout, stderr) => {
@@ -75,6 +80,7 @@ export function createSymLinks(packageName,version) {
                 resolve(false);
                 return;
             }
+            console.log(`Symlink created for ${packageName}@${version}`)
             resolve(true);
         })
     })
