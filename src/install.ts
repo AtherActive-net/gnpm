@@ -9,6 +9,7 @@ import { createModuleDir, getPackageMetaData, getVersion, isInstalled, PACKAGE_J
 let fetchedDependencies = [];
 
 export async function installPackage(name:string,version:string,root:boolean = false) {
+    if(version  == "*") version = "latest";
     const metadata:any = await getPackageMetaData(name,version);
     if(metadata === "not found" || metadata == null) return false;
 
