@@ -16,15 +16,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AtherActive-net/gpm.git"
+    "url": "git+https://github.com/AtherActive-net/gnpm.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/AtherActive-net/gpm/issues"
+    "url": "https://github.com/AtherActive-net/gnpm/issues"
   },
-  "homepage": "https://github.com/AtherActive-net/gpm#readme",
+  "homepage": "https://github.com/AtherActive-net/gnpm#readme",
   "type": "module",
   "devDependencies": {
     "@types/node": "^18.14.6",
