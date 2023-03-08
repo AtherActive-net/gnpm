@@ -25,6 +25,7 @@ export async function installPackage(name:string,version:string,root:boolean = f
 
     if(metadata?.dependencies) await installDependencies(metadata);
     if(root) fetchedDependencies = new Array();
+    return metadata
 }
 
 export async function downloadPackage(metadata) {
