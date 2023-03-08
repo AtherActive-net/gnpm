@@ -4,7 +4,7 @@ import fs from "fs";
 import tar from "tar";
 
 import { fetchArchive, fetchNpm } from "./lib/fetch.js";
-import { createModuleDir, getPackageMetaData, getVersion, isInstalled } from "./lib/common.js";
+import { createModuleDir, getPackageMetaData, getVersion, isInstalled, PACKAGE_JSON_PATH } from "./lib/common.js";
 
 let fetchedDependencies = [];
 
@@ -65,14 +65,14 @@ async function installDependencies(metadata) {
 }
 
 
-
-"ln -s ${process.cwd()}/node_modules/${packageName} ${folder}/node_modules/${packageName}"
-export function createSymLink(packageName,version) {
+export async function createSymLink(packageName,version) {
+    const workingDir = (await PACKAGE_JSON_PATH).replace('/package.json','');
+    if(!fs.existsSync(`${workingDir}/node_modules`)) fs.mkdirSync(`${workingDir}/node_modules`);
 
     const packageFolder = `${os.homedir()}/.gnpm/modules/${packageName}-${version}`;
     if(packageName.includes('/')) {
         const splitName = packageName.split('/')
-        fs.mkdirSync(`${process.cwd()}/node_modules/${splitName[0]}`, {recursive: true})
+        fs.mkdirSync(`${workingDir}/node_modules/${splitName[0]}`, {recursive: true})
     }
 
 

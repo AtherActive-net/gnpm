@@ -54,7 +54,6 @@ export async function getClosestPackageJson() {
     while(currentPath != "/") {
         const packageJson = path.join(currentPath,"package.json");
         if(fs.existsSync(packageJson)) {
-            console.log(`Found package.json at ${packageJson}`)
             return packageJson;
         }
         currentPath = path.dirname(currentPath);

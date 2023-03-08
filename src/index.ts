@@ -5,9 +5,8 @@ import {exec} from "child_process";
 import { Command } from "commander";
 import pjson from "../package.json" assert {type: "json"};
 
-import { createFolderIfNotExists } from "./prereqs.js";
 import { installPackage} from "./install.js";
-import { PACKAGE_JSON_PATH, readPackageJson, writePackageJson } from "./lib/common.js";
+import { readPackageJson, writePackageJson } from "./lib/common.js";
 
 const program = new Command();
 
