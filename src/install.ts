@@ -77,7 +77,7 @@ export async function createSymLink(packageName,version) {
         fs.mkdirSync(`${workingDir}/node_modules/${splitName[0]}`, {recursive: true})
     }
 
-    let command = `ln -sf ${packageFolder} ${workingDir}/${packageName}`
+    let command = `ln -sf ${packageFolder} ${workingDir}/node_modules/s${packageName}`
     return new Promise((resolve, reject) => {
         exec(command, (error, stdout, stderr) => {
             if (error) {
