@@ -6,7 +6,7 @@ import { Command } from "commander";
 import pjson from "../package.json" assert {type: "json"};
 
 import { installPackage} from "./install.js";
-import { readPackageJson, writePackageJson } from "./lib/common.js";
+import { readPackageJson, writePackageJson } from "./lib/packageJson.js";
 
 const program = new Command();
 

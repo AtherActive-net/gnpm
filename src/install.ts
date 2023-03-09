@@ -67,7 +67,7 @@ async function installDependencies(metadata) {
 
 
 export async function createSymLink(packageName,version) {
-    const workingDir = (await PACKAGE_JSON_PATH).replace('/package.json','');
+    const workingDir:string = (await PACKAGE_JSON_PATH).replace('/package.json','');
     if(!fs.existsSync(`${workingDir}/node_modules`)) fs.mkdirSync(`${workingDir}/node_modules`);
 
     const packageFolder = `${os.homedir()}/.gnpm/modules/${packageName}-${version}`;
@@ -76,9 +76,7 @@ export async function createSymLink(packageName,version) {
         fs.mkdirSync(`${workingDir}/node_modules/${splitName[0]}`, {recursive: true})
     }
 
-
     let command = `ln -sf ${packageFolder} ${process.cwd()}/node_modules/${packageName}`
-
     return new Promise((resolve, reject) => {
         exec(command, (error, stdout, stderr) => {
             if (error) {
