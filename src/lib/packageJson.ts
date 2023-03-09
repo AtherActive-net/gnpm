@@ -1,3 +1,8 @@
+import os from "os";
+import path from "path";
+import fs from "fs";
+import { exec } from "child_process";
+
 export const PACKAGE_JSON_PATH = getClosestPackageJson();
 
 export async function getClosestPackageJson() {
