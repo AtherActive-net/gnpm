@@ -72,12 +72,12 @@ export async function createSymLink(packageName,version) {
     if(!fs.existsSync(`${workingDir}/node_modules`)) fs.mkdirSync(`${workingDir}/node_modules`);
 
     const packageFolder = `${os.homedir()}/.gnpm/modules/${packageName}-${version}`;
-    if(packageName.includes('/')) {
+    if(packageName.includes('/') && packageName.includes("@")) {
         const splitName = packageName.split('/')
         fs.mkdirSync(`${workingDir}/node_modules/${splitName[0]}`, {recursive: true})
     }
 
-    let command = `ln -sf ${packageFolder} ${workingDir}/node_modules/s${packageName}`
+    let command = `ln -sf ${packageFolder} ${workingDir}/node_modules/${packageName}`
     return new Promise((resolve, reject) => {
         exec(command, (error, stdout, stderr) => {
             if (error) {
