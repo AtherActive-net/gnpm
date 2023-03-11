@@ -3,9 +3,9 @@ import os from "os";
 import fs from "fs";
 import tar from "tar";
 
-import { fetchArchive, fetchNpm } from "./lib/fetch.js";
-import { createModuleDir, getPackageMetaData, getVersion, isInstalled } from "./lib/common.js";
-import {PACKAGE_JSON_PATH} from "./lib/packageJson.js";
+import { fetchArchive, fetchNpm } from "../lib/fetch.js";
+import { createModuleDir, getPackageMetaData, getVersion, isInstalled } from "../lib/common.js";
+import {PACKAGE_JSON_PATH} from "../lib/packageJson.js";
 
 let fetchedDependencies = [];
 

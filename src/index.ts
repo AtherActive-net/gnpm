@@ -1,17 +1,18 @@
 #!/bin/sh
 ':' //; exec "$(command -v nodejs || command -v node)" "$0" "$@"
-import os from "os";
 import {exec} from "child_process";
 import { Command } from "commander";
 import pjson from "../package.json" assert {type: "json"};
-
-import { installPackage} from "./install.js";
 import { readPackageJson, writePackageJson } from "./lib/packageJson.js";
+
+import { node } from "./commands/node";
+import { installPackage} from "./commands/install.js";
+import { run } from "./commands/run.js";
 
 const program = new Command();
 
 program
-    .name("test")
+    .name("gnpm")
     .version(pjson.version)
     .description(pjson.description);
 
@@ -36,12 +37,14 @@ program.command("node")
     .description("Run a script with node")
     .argument("<script>", "Script to run")
     .action(async (script:string) => {
-        console.log("Running script", script)
+        await node(script);
+    })
 
-        const child = exec(`node --preserve-symlinks ${script}`, {cwd: process.cwd()});
-        child.stdout.pipe(process.stdout);
-        child.stderr.pipe(process.stderr);
-
+program.command("run")
+    .description("Run a script defined in your package.json")
+    .argument("<script>", "Script to run")
+    .action(async (script:string) => {
+        await run(script);
     })
 
 program.parse();
