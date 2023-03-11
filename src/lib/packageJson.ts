@@ -18,13 +18,13 @@ export async function getClosestPackageJson() {
     return await getClosestPackageJson();
 }
 
-export async function readPackageJson() {
-    const file = fs.readFileSync(await PACKAGE_JSON_PATH);
+export async function readPackageJson(path=PACKAGE_JSON_PATH) {
+    const file = fs.readFileSync(await path);
     return JSON.parse(file.toString());
 }
 
-export async function writePackageJson(data) {
-    fs.writeFileSync(await PACKAGE_JSON_PATH, JSON.stringify(data,null,4));
+export async function writePackageJson(data, path=PACKAGE_JSON_PATH) {
+    fs.writeFileSync(await path, JSON.stringify(data,null,4));
 }
 
 export async function createPackageJson() {

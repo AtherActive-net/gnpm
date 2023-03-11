@@ -5,9 +5,10 @@ import { Command } from "commander";
 import pjson from "../package.json" assert {type: "json"};
 import { readPackageJson, writePackageJson } from "./lib/packageJson.js";
 
-import { node } from "./commands/node";
+import { node } from "./commands/node.js";
 import { installPackage} from "./commands/install.js";
 import { run } from "./commands/run.js";
+import { uninstallPackage } from "./commands/uninstall.js";
 
 const program = new Command();
 
@@ -31,6 +32,13 @@ program.command("install")
         if(!packageJson.dependencies) packageJson.dependencies = {};
         packageJson.dependencies[pkg] = metadata.version;
         await writePackageJson(packageJson);
+    });
+
+program.command("uninstall")
+    .description("Uninstall a package")
+    .argument("<package>", "Package to uninstall")
+    .action(async (pkg:string) => {
+        uninstallPackage(pkg);
     });
 
 program.command("node")
