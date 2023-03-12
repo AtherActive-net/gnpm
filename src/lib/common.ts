@@ -9,7 +9,7 @@ import {PACKAGE_JSON_PATH} from "./packageJson.js"
 export async function getPackageMetaData(name,version) {
     const versionRegex = /(\d+\.)?(\d+\.)?(\*|\d+)/;
     const foundVersion = versionRegex.exec(version);
-    const finalVersion = (version == "latest" ? 'latest' : foundVersion[0])
+    const finalVersion = (version == "latest" ? 'latest' : (foundVersion == undefined ? "latest" : foundVersion[0]))
 
     console.log("Fetching metadata for: ", name, "@", finalVersion)
     return await fetchNpm('/' + name + '/' + finalVersion);
