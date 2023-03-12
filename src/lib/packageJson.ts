@@ -19,7 +19,12 @@ export async function getClosestPackageJson() {
 }
 
 export async function readPackageJson(path=PACKAGE_JSON_PATH) {
-    const file = fs.readFileSync(await path);
+    let file;
+    try {
+        file = fs.readFileSync(await path);
+    } catch {
+        return undefined
+    }
     return JSON.parse(file.toString());
 }
 
