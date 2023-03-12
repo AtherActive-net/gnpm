@@ -19,19 +19,33 @@ program
 
 program.command("install")
     .description("Install a package")
-    .argument("<package>", "Package to install")
+    .argument("[package]", "Package to install")
     .option('-v, --version <version>', 'Version to install')
     .action(async (pkg:string, options) => {
         let packageJson = await readPackageJson();
-        options.version = options.version ? options.version : "latest"
+        if(!pkg) pkg = "all"
 
-        console.log("Installing package", pkg, "with version", options.version)
-        const metadata = await installPackage(pkg,options.version,true);
-        if(!metadata) return;
+        if(pkg == "all") {
+            const dependencies = Object.keys(packageJson.dependencies);
+            for(const dependency of dependencies) {
+                const metadata = await installPackage(dependency,packageJson.dependencies[dependency],true);
+                if(!metadata) continue;
+                packageJson.dependencies[dependency] = metadata.version;
+            }
+            await writePackageJson(packageJson);
+        }
+        else {
+            options.version = options.version ? options.version : "latest"
 
-        if(!packageJson.dependencies) packageJson.dependencies = {};
-        packageJson.dependencies[pkg] = metadata.version;
-        await writePackageJson(packageJson);
+            console.log("Installing package", pkg, "with version", options.version)
+            const metadata = await installPackage(pkg,options.version,true);
+            if(!metadata) return;
+    
+            if(!packageJson.dependencies) packageJson.dependencies = {};
+            packageJson.dependencies[pkg] = metadata.version;
+            await writePackageJson(packageJson);
+        }
+
     });
 
 program.command("uninstall")
