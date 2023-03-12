@@ -2,34 +2,27 @@ import { readPackageJson, writePackageJson } from "../lib/packageJson.js";
 import { PACKAGE_JSON_PATH } from "../lib/packageJson.js";
 import {exec} from "child_process";
 import { getPackageMetaData } from "../lib/common.js";
+import { installAll } from "./install.js";
 
 
 export async function uninstallPackageCommand(pkg:string) {
-    const pjson = await readPackageJson();
+    const pjson = await readPackageJson(await PACKAGE_JSON_PATH);
     const metadata = await getPackageMetaData(pkg, pjson.dependencies[pkg]);
 
     pkg = metadata["name"];
 
+    pjson.dependencies[pkg] = undefined;
+    await writePackageJson(pjson);
+
     const packageDependencies = await getPacakgeDependencies(pkg);
+    await Promise.all(packageDependencies.map(async (dependency) => { await uninstall(dependency) }));
+    await installAll();
 
     console.log(`Uninstalled ${pkg} and obsolute dependencies`);
-
-    for(const dependency of packageDependencies) {
-        await uninstall(dependency);
-    }
 }
 
 export async function uninstall(packageName:string) {
-
-    try {
-        const packageJson = await readPackageJson();
-        if(packageJson && packageJson.dependencies && packageJson.dependencies[packageName]) delete packageJson.dependencies[packageName];
-        await writePackageJson(packageJson);
-        await deleteSymLink(packageName);
-    } catch {
-        await deleteSymLink(packageName);
-    }
-
+    await deleteSymLink(packageName);
 }
 
 async function deleteSymLink(pkg:string) {
@@ -43,9 +36,13 @@ async function deleteSymLink(pkg:string) {
 async function getPacakgeDependencies(pkg) {
     let totalDependencies = [];
     const pkgJsonPath = (await PACKAGE_JSON_PATH).replace('/package.json','')+`/node_modules/${pkg}/package.json`;
-    const packageJson = await readPackageJson(pkgJsonPath);
-
-    if(!packageJson.dependencies) return [];
+    let packageJson = undefined;
+    try {
+        packageJson = await readPackageJson(pkgJsonPath);
+    } catch {
+        return []
+    }
+    if(!packageJson?.dependencies) return [];
     const dependencies = Object.keys(packageJson.dependencies);
 
     dependencies.forEach(async (dependency) => {

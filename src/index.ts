@@ -6,7 +6,7 @@ import pjson from "../package.json" assert {type: "json"};
 import { readPackageJson, writePackageJson } from "./lib/packageJson.js";
 
 import { node } from "./commands/node.js";
-import { installPackage} from "./commands/install.js";
+import { installAll, installPackage} from "./commands/install.js";
 import { run } from "./commands/run.js";
 import { uninstallPackageCommand } from "./commands/uninstall.js";
 
@@ -26,13 +26,7 @@ program.command("install")
         if(!pkg) pkg = "all"
 
         if(pkg == "all") {
-            const dependencies = Object.keys(packageJson.dependencies);
-            for(const dependency of dependencies) {
-                const metadata = await installPackage(dependency,packageJson.dependencies[dependency],true);
-                if(!metadata) continue;
-                packageJson.dependencies[dependency] = metadata.version;
-            }
-            await writePackageJson(packageJson);
+            await installAll();
         }
         else {
             options.version = options.version ? options.version : "latest"

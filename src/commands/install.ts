@@ -5,9 +5,20 @@ import tar from "tar";
 
 import { fetchArchive, fetchNpm } from "../lib/fetch.js";
 import { createModuleDir, getPackageMetaData, getVersion, isInstalled } from "../lib/common.js";
-import {PACKAGE_JSON_PATH} from "../lib/packageJson.js";
+import {PACKAGE_JSON_PATH, readPackageJson, writePackageJson} from "../lib/packageJson.js";
 
 let fetchedDependencies = [];
+
+export async function installAll() {
+    let packageJson = await readPackageJson();
+    const dependencies = Object.keys(packageJson.dependencies);
+    for(const dependency of dependencies) {
+        const metadata = await installPackage(dependency,packageJson.dependencies[dependency],true);
+        if(!metadata) continue;
+        packageJson.dependencies[dependency] = metadata.version;
+    }
+    await writePackageJson(packageJson);
+}
 
 export async function installPackage(name:string,version:string,root:boolean = false) {
     if(version  == "*") version = "latest";
